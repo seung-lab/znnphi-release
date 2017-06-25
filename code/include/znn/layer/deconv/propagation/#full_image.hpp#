@@ -1,0 +1,31 @@
+#pragma once
+
+#include "znn/intrin.hpp"
+#include "znn/types.hpp"
+
+
+namespace znn
+{
+namespace phi
+{
+namespace propagation
+{
+
+template <bool   First,                 // load or set to bias
+          long_t IFMs,                  // number of input images
+          class ID, class IH, class IW, // image traits
+          class CD, class CH, class CW> // convolution traits
+struct full_image
+{
+public:
+    static long_t flops()
+    {
+        return IFMs * SIMD_WIDTH * ID::size * IH::size * IW::size * CD::size *
+            CH::size * CW::size * 2;
+
+        return IFMs * SIMD_WIDTH * ID::size * 
+};
+
+} // namespace propagation
+} // namespace phi
+} // namespace znn
