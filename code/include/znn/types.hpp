@@ -1,18 +1,18 @@
 #pragma once
 
 //#include <complex>
+#include <complex>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <iostream>
+#include <list>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <ostream>
-#include <zi/vl/vl.hpp>
-#include <complex>
-#include <list>
-#include <map>
 #include <vector>
+#include <zi/vl/vl.hpp>
 
 // GCC version
 #if defined(__GNUC__) && !defined(GCC_VERSION) && !defined(__clang__)
@@ -153,7 +153,7 @@ struct hbw_pointer_tag
 };
 
 template <typename T, typename Tag>
-class pointer
+class pointer_t
 {
 public:
     typedef T  value_type;
@@ -163,38 +163,38 @@ private:
     pointer_type ptr_;
 
 public:
-    explicit pointer(pointer_type p = nullptr)
+    explicit pointer_t(pointer_type p = nullptr)
         : ptr_(p)
     {
     }
 
-    pointer(std::nullptr_t)
+    pointer_t(std::nullptr_t)
         : ptr_(nullptr)
     {
     }
 
-    pointer(pointer const& other)
+    pointer_t(pointer_t const& other)
         : ptr_(other.get())
     {
     }
 
     template <typename O>
-    pointer(pointer<O, Tag> const& other,
-            typename std::enable_if<std::is_convertible<O, T>::value,
-                                    void*>::type = 0)
+    pointer_t(pointer_t<O, Tag> const& other,
+              typename std::enable_if<std::is_convertible<O, T>::value,
+                                      void*>::type = 0)
         : ptr_(other.get())
     {
     }
 
-    pointer& operator=(pointer const& other)
+    pointer_t& operator=(pointer_t const& other)
     {
         ptr_ = other.ptr_;
         return *this;
     }
 
     template <typename O>
-    typename std::enable_if<std::is_convertible<O, T>::value, pointer&>::type
-    operator=(pointer<O, Tag> const& other)
+    typename std::enable_if<std::is_convertible<O, T>::value, pointer_t&>::type
+    operator=(pointer_t<O, Tag> const& other)
     {
         ptr_ = other.get();
         return *this;
@@ -207,8 +207,8 @@ public:
 
 template <typename T, typename charT, typename traits>
 std::basic_ostream<charT, traits>&
-operator<<(std::basic_ostream<charT, traits>&  os,
-           pointer<T, host_pointer_tag> const& p)
+operator<<(std::basic_ostream<charT, traits>&    os,
+           pointer_t<T, host_pointer_tag> const& p)
 {
     os << "h[" << p.get() << "]";
     return os;
@@ -216,8 +216,8 @@ operator<<(std::basic_ostream<charT, traits>&  os,
 
 template <typename T, typename charT, typename traits>
 std::basic_ostream<charT, traits>&
-operator<<(std::basic_ostream<charT, traits>& os,
-           pointer<T, hbw_pointer_tag> const& p)
+operator<<(std::basic_ostream<charT, traits>&   os,
+           pointer_t<T, hbw_pointer_tag> const& p)
 {
     os << "x[" << p.get() << "]";
     return os;
@@ -225,8 +225,8 @@ operator<<(std::basic_ostream<charT, traits>& os,
 
 template <typename T, typename charT, typename traits>
 std::basic_ostream<charT, traits>&
-operator<<(std::basic_ostream<charT, traits>&    os,
-           pointer<T, device_pointer_tag> const& p)
+operator<<(std::basic_ostream<charT, traits>&      os,
+           pointer_t<T, device_pointer_tag> const& p)
 {
     os << "d[" << p.get() << "]";
     return os;
@@ -235,13 +235,13 @@ operator<<(std::basic_ostream<charT, traits>&    os,
 } //  Namespace detail
 
 template <typename T>
-using host_ptr = detail::pointer<T, detail::host_pointer_tag>;
+using host_ptr = detail::pointer_t<T, detail::host_pointer_tag>;
 
 template <typename T>
-using hbw_ptr = detail::pointer<T, detail::hbw_pointer_tag>;
+using hbw_ptr = detail::pointer_t<T, detail::hbw_pointer_tag>;
 
 template <typename T>
-using device_ptr = detail::pointer<T, detail::device_pointer_tag>;
+using device_ptr = detail::pointer_t<T, detail::device_pointer_tag>;
 
 inline constexpr long_t vector_align(long_t bytes)
 {
